@@ -156,13 +156,12 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
       for (auto const& litesimphotons : (*opdetHandle)) {
         std::vector<short unsigned int> waveform;
         waveform.reserve(fConfig.Nsamples);
-        const unsigned ch = litesimphotons.OpChannel;
+        const unsigned int ch = litesimphotons.OpChannel;
         const std::string pdtype = fConfig.pdsMap.pdType(ch);
         // only work on the prescribed channels
         if (ch < start || ch >= start + n) continue;
 
-        if((Reflected) &&
-           ( (pdtype == "pmt_uncoated") || (pdtype == "pmt_coated")) ) { //All PMT channels
+        if(pdtype == "pmt_coated") {
           pmtDigitizer->ConstructWaveformLite(ch,
                                               litesimphotons,
                                               waveform,
@@ -172,7 +171,20 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                               fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
+                                                  waveform);
+        }
+        else if(Reflected && (pdtype == "pmt_uncoated")) {
+          pmtDigitizer->ConstructWaveformLite(ch,
+                                              litesimphotons,
+                                              waveform,
+                                              pdtype,
+                                              directPhotonsOnPMTS,
+                                              startTime,
+                                              fConfig.Nsamples);
+          // including pre trigger window and transit time
+          fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
+                                                  ch,
                                                   waveform);
         }
         // getting only xarapuca channels with appropriate type of light
@@ -186,7 +198,7 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                                   fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
                                                   waveform);
         }
         // getting only arapuca channels with appropriate type of light
@@ -200,7 +212,7 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                                   fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
                                                   waveform);
         }
       }
@@ -219,12 +231,12 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
       const bool Reflected = (opdetHandle.provenance()->productInstanceName() == "Reflected");
       for (auto const& simphotons : (*opdetHandle)) {
         std::vector<short unsigned int> waveform;
-        const unsigned ch = simphotons.OpChannel();
+        const unsigned int ch = simphotons.OpChannel();
         const std::string pdtype = fConfig.pdsMap.pdType(ch);
         // only work on the prescribed channels
         if (ch < start || ch >= start + n) continue;
         // all PMTs
-        if((Reflected) && (pdtype == "pmt_uncoated" || pdtype == "pmt_coated")) {
+        if(pdtype == "pmt_coated") {
           pmtDigitizer->ConstructWaveform(ch,
                                           simphotons,
                                           waveform,
@@ -234,7 +246,20 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                           fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
+                                                  waveform);
+        }
+        else if(Reflected && pdtype == "pmt_uncoated") {
+          pmtDigitizer->ConstructWaveform(ch,
+                                          simphotons,
+                                          waveform,
+                                          pdtype,
+                                          directPhotonsOnPMTS,
+                                          startTime,
+                                          fConfig.Nsamples);
+          // including pre trigger window and transit time
+          fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
+                                                  ch,
                                                   waveform);
         }
         // getting only arapuca channels with appropriate type of light
@@ -248,7 +273,7 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                               fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
                                                   waveform);
         }
         // getting only arapuca channels with appropriate type of light
@@ -262,7 +287,7 @@ void opdet::opDetDigitizerWorker::MakeWaveforms(opdet::DigiPMTSBNDAlg *pmtDigiti
                                               fConfig.Nsamples);
           // including pre trigger window and transit time
           fWaveforms->at(ch) = raw::OpDetWaveform(fConfig.EnableWindow[0],
-                                                  (unsigned int)ch,
+                                                  ch,
                                                   waveform);
         }
       }//optical channel loop
