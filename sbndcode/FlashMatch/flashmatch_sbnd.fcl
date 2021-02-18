@@ -13,6 +13,7 @@ sbnd_simple_flashmatch:{
   SelectNeutrino: true
   UseUncoatedPMT: true
   UseARAPUCAS: true
+  StoreCheatMCT0: true
   # UseCalo: false
   InputFileName: "FlashMatch/fm_metrics_sbnd.root"
   NoAvailableMetrics: false
